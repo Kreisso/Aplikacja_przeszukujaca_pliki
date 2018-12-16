@@ -32,6 +32,7 @@ public class PoszukiwaczSciezek implements Runnable{
                 else
                 {
                     queue.put(listFiles[i]);
+
                 }
             }
         }

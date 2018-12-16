@@ -66,6 +66,7 @@ public class SearchFileController {
 
                 view.restartRowCount();
                 try {
+                    System.out.println(multimap);
                     multimap.clear();
                 }catch (ConcurrentModificationException e1)
                 {
@@ -108,7 +109,9 @@ public class SearchFileController {
 
 private void getFiles()
 {
-    file = new File(System.getProperty("user.dir"));
+//    String path = "/Users/kreisso/Desktop/";
+    String path = System.getProperty("user.home");
+    file = new File(path);
     sample = new String(view.getInputSearchBySample());
 
     BlockingQueue<File> arrayBlockingQueue = new ArrayBlockingQueue<File>(5);
