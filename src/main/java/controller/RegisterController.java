@@ -1,9 +1,10 @@
 package controller;
 
-import model.Server.Connectivity;
-import model.Server.Register;
-import view.Frame;
-import view.loginpanel.RegisterFrame;
+import View.Frame;
+import View.loginpanel.RegisterFrame;
+import controller.Server.Connectivity;
+import controller.Server.Register;
+
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -1,12 +1,12 @@
 package controller;
 
-import model.Server.ClientMain;
-import model.Server.Connectivity;
-import model.Server.Login;
-import model.Server.Register;
-import view.loginpanel.LoginFrame;
-import view.loginpanel.RegisterFrame;
-import view.mainviews.ClientMainFrame;
+import View.loginpanel.LoginFrame;
+import View.loginpanel.RegisterFrame;
+import controller.Server.ClientMain;
+import controller.Server.Connectivity;
+import controller.Server.Login;
+import controller.Server.Register;
+
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -158,9 +158,9 @@ public class LoginController {
                 }
 
 
-                new MainClientController(new ClientMain(), new ClientMainFrame("Panel klienta"),
-                        view, ukk, con );
-                view.setVisible(false);
+//                new MainClientController(new ClientMain(), new ClientMainFrame("Panel klienta"),
+//                        view, ukk, con );
+//                view.setVisible(false);
             }
             else {
                 //TODO add label with error
