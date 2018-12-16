@@ -187,6 +187,7 @@ public class RegisterFrame extends Frame {
         buttonSignUp.setSize(200,50);
         buttonSignUp.setLocation(frameWidth - 250,firstFieldHeight+(6*spaceBetween)+100);
         buttonSignUp.addActionListener(actionListener);
+
         this.getRootPane().setDefaultButton(buttonSignUp);
         this.add(buttonSignUp);
     }

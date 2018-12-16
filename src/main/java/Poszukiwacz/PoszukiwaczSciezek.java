@@ -10,8 +10,8 @@ import java.util.concurrent.BlockingQueue;
 public class PoszukiwaczSciezek implements Runnable{
 
 
-        BlockingQueue<File> queue;
-        File mainPath;
+    private BlockingQueue<File> queue;
+    private File mainPath;
 
         public PoszukiwaczSciezek(BlockingQueue<File> kolejka, File sciezkaGlowna){
 

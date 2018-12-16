@@ -2,10 +2,11 @@ package controller;
 
 import View.loginpanel.LoginFrame;
 import View.loginpanel.RegisterFrame;
-import controller.Server.ClientMain;
+import View.loginpanel.SearchFileFrame;
 import controller.Server.Connectivity;
 import controller.Server.Login;
 import controller.Server.Register;
+import controller.Server.SearchFile;
 
 
 import java.awt.event.ActionEvent;
@@ -18,7 +19,6 @@ public class LoginController {
     private Login model;
     private LoginFrame view;
     private Connectivity con;
-    private int ukk;
 
     public LoginController(Login model, LoginFrame view) {
         this.model = model;
@@ -52,7 +52,6 @@ public class LoginController {
         return model.getPassword();
     }
 
-
     private String getViewNick()
     {
         return view.getLogin();
@@ -78,7 +77,7 @@ public class LoginController {
         view.setButtonGoToSignUp(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("click go sign up button");
-                // TODO
+
                 RegisterController registerController = new RegisterController(
                         new Register(), new RegisterFrame("Rejestracja"), view );
                 view.setVisible(false);
@@ -92,7 +91,7 @@ public class LoginController {
         ResultSet resultSet = null;
 
 
-        String sql="select * from user where login=? and password=?";
+        String sql="select * from users where login=? and password=?";
         try{
             con =  new Connectivity();
             setModelNick(getViewNick());
@@ -106,8 +105,6 @@ public class LoginController {
             if(resultSet.next())
             {
                 setModelStatus(true);
-                System.out.println(ukk);
-
             }
             else
             {
@@ -124,43 +121,13 @@ public class LoginController {
         finally {
             if (model.isStatus()) {
                 System.out.println("login");
-
-                 preparedStatement = null;
-                 resultSet = null;
-
-
-                 sql="select ukk from client where login=? ";
-                try{
-                    //con =  new Connectivity();
+                view.setVisible(false);
+                SearchFileController searchFileController = new SearchFileController(new SearchFile(),
+                        new SearchFileFrame("Wyszukiwanie pliku"),
+                        view,
+                        con );
 
 
-                    preparedStatement = con.getConn().prepareStatement(sql);
-                    preparedStatement.setString(1, getModelNick());
-                    resultSet = preparedStatement.executeQuery();
-
-                    if(resultSet.next())
-                    {
-                        ukk = resultSet.getInt("ukk");
-
-
-                    }
-                    else
-                    {
-
-                    }
-                }
-                catch(SQLException ex)
-                {
-                    System.out.println(ex);
-                }
-                catch (Exception e){
-                    System.out.println(e);
-                }
-
-
-//                new MainClientController(new ClientMain(), new ClientMainFrame("Panel klienta"),
-//                        view, ukk, con );
-//                view.setVisible(false);
             }
             else {
                 //TODO add label with error

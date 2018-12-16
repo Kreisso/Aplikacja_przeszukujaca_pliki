@@ -1,5 +1,9 @@
 package Poszukiwacz;
 
+import View.Frame;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,15 +17,25 @@ import java.util.concurrent.BlockingQueue;
 public class PrzeszukiwaczPliku implements Runnable{
 
 
-    BlockingQueue<File> queue;
-    String sample;
+    private BlockingQueue<File> queue;
+    private String sample;
+    private Multimap<String,String> multimap;
+    private Frame view;
+    private String[] result = new String[3];
 
-    public PrzeszukiwaczPliku(BlockingQueue<File> queue, String sample){
+
+
+    public PrzeszukiwaczPliku(BlockingQueue<File> queue, String sample, Frame view, Multimap<String, String> multimap){
 
         this.queue = queue;
         this.sample = sample;
+        this.view = view;
+        this.multimap = multimap;
 
+    }
 
+    public Multimap<String, String> getMultimap() {
+        return multimap;
     }
 
     public void FindWord(File file) throws FileNotFoundException {
@@ -34,8 +48,8 @@ public class PrzeszukiwaczPliku implements Runnable{
             lineNumber++;
 
             if(reader.nextLine().contains(sample))
-                System.out.println("Szukane słowo znajduje się w pliku: "+file.getPath()+" w lini "+lineNumber);
-
+                //System.out.println("Szukane słowo znajduje się w pliku: "+file.getPath()+" w lini "+lineNumber);
+                multimap.put(file.getPath(), String.valueOf(lineNumber));
         }
 
         reader.close();

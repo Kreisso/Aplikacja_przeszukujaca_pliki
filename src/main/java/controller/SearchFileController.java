@@ -1,21 +1,27 @@
 package controller;
 
+import Poszukiwacz.PoszukiwaczSciezek;
+import Poszukiwacz.PrzeszukiwaczPliku;
 import View.Frame;
-import View.mainpanel.SearchFileFrame;
+import View.loginpanel.SearchFileFrame;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import controller.Server.Connectivity;
 import controller.Server.SearchFile;
-
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.File;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+
 
 public class SearchFileController {
+    private File file;
+    private  Multimap<String,String> multimap;
+    private String sample;
     private SearchFile model;
     private SearchFileFrame view;
     private Connectivity con;
@@ -26,7 +32,7 @@ public class SearchFileController {
         this.view = view;
         this.con = con;
         this.previousView = previousView;
-        setMyPoliciesMenuListener();
+        multimap = ArrayListMultimap.create();
         setViewCity();
     }
 
@@ -34,91 +40,106 @@ public class SearchFileController {
         this.model = model;
         this.view = view;
         this.previousView = previousView;
-        setMyPoliciesMenuListener();
+        multimap = ArrayListMultimap.create();
+
         setViewCity();
     }
 
     private String getModelCity(){
-        return model.getCity();
+        return model.getSample();
     }
 
 
     private void setModelCity(String city){
-        model.setCity(city);
+        model.setSample(city);
     }
 
 
 
     private String getViewCity(){
-        return view.getInputSearchByCity();
+        return view.getInputSearchBySample();
     }
 
     private void setViewCity(){
         view.setSearchByCityButton(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+
+                view.restartRowCount();
+                try {
+                    multimap.clear();
+                }catch (ConcurrentModificationException e1)
+                {
+                    System.out.println("test");
+                }finally {
+
+                }
                 System.out.println("search");
-                getMultiagencies();
-//                addColumnsToMultiagenciesTable();
+                getFiles();
+
+                try {
+                    TimeUnit.SECONDS.sleep(3);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+                finally {
+                    while (true) {
+                        try {
+                            addColumnsToTable();
+                            break;
+                        } catch (ConcurrentModificationException e1) {
+                            System.out.println("test");
+
+                            try {
+                                TimeUnit.SECONDS.sleep(3);
+                            } catch (InterruptedException e2) {
+                                e1.printStackTrace();
+                            }
+
+                        } finally {
+
+                        }
+                    }
+                }
+
+
             }
         });
     }
 
-    private void getMultiagencies() {
-        view.restartRowCount();
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-        setModelCity(getViewCity());
-        String sql="select * from multiagency INNER join contact on multiagency.contact_id=contact.id where city=?";
-        try{
-            con =  new Connectivity();
-            System.out.println(getModelCity());
-            preparedStatement = con.getConn().prepareStatement(sql);
-            preparedStatement.setString(1, getModelCity());
-            resultSet = preparedStatement.executeQuery();
-            while (resultSet.next())
-            {
-                System.out.println("w srodku 1");
+private void getFiles()
+{
+    file = new File(System.getProperty("user.dir"));
+    sample = new String(view.getInputSearchBySample());
 
-            }
+    BlockingQueue<File> arrayBlockingQueue = new ArrayBlockingQueue<File>(5);
+    new Thread(new PoszukiwaczSciezek(arrayBlockingQueue, file)).start();;
+
+    for (int i = 0; i < 50; i++)
+        new Thread(new PrzeszukiwaczPliku(arrayBlockingQueue, sample, view, multimap)).start();
+
+
+
+}
+
+
+
+    public void addColumnsToTable(){
+
+        String[] result = new String[3];
+        int i = 0;
+        for (String key : multimap.keys()) {
+            result[0] = String.valueOf(i++);
+            result[1] = String.valueOf(key);
+            result[2] = String.valueOf(multimap.get(key));
+            System.out.println(multimap.get(key));
+            view.addColumnToMultiagencyTable(result);
+
         }
-        catch(SQLException ex)
-        {
-            System.out.println(ex);
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
+
+
+
     }
 
 
 
-//    public void addColumnsToMultiagenciesTable(){
-//        List<Multiagency> multiagencyList = model.getMultiagencies();
-//        System.out.println(multiagencyList);
-//        Iterator it = multiagencyList.iterator();
-//        int i = 0;
-//        while(it.hasNext()){
-//            i++;
-//            Multiagency multiagency = (Multiagency) it.next();
-//            view.addColumnToMultiagencyTable(multiagency.infoForTable(i));
-//        }
-//    }
-
-    private void setMyPoliciesMenuListener()
-    {
-        view.setMyPoliciesMenuListener(new MenuListener() {
-            public void menuSelected(MenuEvent e) {
-                previousView.setVisible(true);
-                view.dispose();
-            }
-
-            public void menuDeselected(MenuEvent e) {
-
-            }
-
-            public void menuCanceled(MenuEvent e) {
-
-            }
-        });
-    }
 }

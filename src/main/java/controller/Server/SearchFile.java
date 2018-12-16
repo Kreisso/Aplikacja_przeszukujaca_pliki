@@ -1,26 +1,23 @@
 package controller.Server;
 
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class SearchFile {
-    private String city;
+    private String sample;
 
     public SearchFile(){
 
     }
 
-    public SearchFile(String city) {
-        this.city = city;
+    public SearchFile(String sample) {
+        this.sample = sample;
     }
 
-    public String getCity() {
-        return city;
+    public String getSample() {
+        return sample;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setSample(String sample) {
+        this.sample = sample;
     }
 
 
