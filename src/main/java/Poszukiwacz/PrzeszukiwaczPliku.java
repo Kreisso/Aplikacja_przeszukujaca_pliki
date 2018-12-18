@@ -20,16 +20,13 @@ public class PrzeszukiwaczPliku implements Runnable{
     private BlockingQueue<File> queue;
     private String sample;
     private Multimap<String,String> multimap;
-    private Frame view;
-    private String[] result = new String[3];
 
 
 
-    public PrzeszukiwaczPliku(BlockingQueue<File> queue, String sample, Frame view, Multimap<String, String> multimap){
+    public PrzeszukiwaczPliku(BlockingQueue<File> queue, String sample, Multimap<String, String> multimap){
 
         this.queue = queue;
         this.sample = sample;
-        this.view = view;
         this.multimap = multimap;
 
     }

@@ -2,12 +2,15 @@ package controller;
 
 import Poszukiwacz.PoszukiwaczSciezek;
 import Poszukiwacz.PrzeszukiwaczPliku;
+import TCP.ClientTCP;
 import View.Frame;
 import View.loginpanel.SearchFileFrame;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import controller.Server.Connectivity;
 import controller.Server.SearchFile;
+
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -75,7 +78,9 @@ public class SearchFileController {
 
                 }
                 System.out.println("search");
-                getFiles();
+//                getFiles();
+                sample = new String(view.getInputSearchBySample());
+                ClientTCP clientTCP = new ClientTCP(sample, multimap);
 
                 try {
                     TimeUnit.SECONDS.sleep(3);
@@ -85,7 +90,9 @@ public class SearchFileController {
                 finally {
                     while (true) {
                         try {
-                            addColumnsToTable();
+//                            System.out.println("dodaje do tbeli");
+
+                            addColumnsToTable(clientTCP.getMultimap());
                             break;
                         } catch (ConcurrentModificationException e1) {
                             System.out.println("test");
@@ -107,34 +114,35 @@ public class SearchFileController {
         });
     }
 
-private void getFiles()
-{
-//    String path = "/Users/kreisso/Desktop/";
-    String path = System.getProperty("user.home");
-    file = new File(path);
-    sample = new String(view.getInputSearchBySample());
+//private void getFiles()
+//{
+////    String path = "/Users/kreisso/Desktop/";
+//    String path = System.getProperty("user.home");
+//    file = new File(path);
+//    sample = new String(view.getInputSearchBySample());
+//
+//    BlockingQueue<File> arrayBlockingQueue = new ArrayBlockingQueue<File>(5);
+//    new Thread(new PoszukiwaczSciezek(arrayBlockingQueue, file)).start();;
+//
+//    for (int i = 0; i < 50; i++)
+//        new Thread(new PrzeszukiwaczPliku(arrayBlockingQueue, sample, multimap)).start();
+//
+//
+//
+//}
 
-    BlockingQueue<File> arrayBlockingQueue = new ArrayBlockingQueue<File>(5);
-    new Thread(new PoszukiwaczSciezek(arrayBlockingQueue, file)).start();;
-
-    for (int i = 0; i < 50; i++)
-        new Thread(new PrzeszukiwaczPliku(arrayBlockingQueue, sample, view, multimap)).start();
 
 
-
-}
-
-
-
-    public void addColumnsToTable(){
+    public void addColumnsToTable(Multimap<String,String> m){
 
         String[] result = new String[3];
         int i = 0;
-        for (String key : multimap.keys()) {
+        System.out.println("addColumns" + m);
+        for (String key : m.keys()) {
             result[0] = String.valueOf(i++);
             result[1] = String.valueOf(key);
-            result[2] = String.valueOf(multimap.get(key));
-            System.out.println(multimap.get(key));
+            result[2] = String.valueOf(m.get(key));
+            System.out.println(m.get(key));
             view.addColumnToMultiagencyTable(result);
 
         }

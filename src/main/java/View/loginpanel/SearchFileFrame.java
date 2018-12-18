@@ -19,6 +19,10 @@ import java.awt.event.ActionListener;
 
         private DefaultTableModel model;
 
+        public JTable getResultTable() {
+            return resultTable;
+        }
+
         public SearchFileFrame(String name) throws HeadlessException {
             super(name);
 
