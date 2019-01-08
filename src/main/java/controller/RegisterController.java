@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterController {
     private Register model;
@@ -44,42 +46,7 @@ public class RegisterController {
     {
         return model.getPassword();
     }
-    private String getRepeatPassword()
-    {
-        return model.getRepeatPassword();
-    }
-    private String getPesel()
-    {
-        return model.getPesel();
-    }
-    private String getName()
-    {
-        return model.getName();
-    }
-    private String getSurname()
-    {
-        return model.getSurname();
-    }
-    private String getCity()
-    {
-        return model.getCity();
-    }
-    private String getStreatAndNumber()
-    {
-        return model.getStreatAndNumber();
-    }
-    private String getPostCode()
-    {
-        return model.getPostCode();
-    }
-     private String getPhoneNumber()
-    {
-        return model.getPhone();
-    }
-    private String getErrorMessage()
-    {
-        return model.getErrorMessage();
-    }
+
 
 
     private void setErrorMessage(String errorMessage)
@@ -94,38 +61,7 @@ public class RegisterController {
     {
         model.setPassword(password);
     }
-    private void setRepeatPassword(String repeatPassword)
-    {
-        model.setRepeatPassword(repeatPassword);
-    }
-    private void setPesel(String pesel)
-    {
-        model.setPesel(pesel);
-    }
-    private void setName(String name)
-    {
-        model.setName(name);
-    }
-    private void setSurname(String surname)
-    {
-        model.setSurname(surname);
-    }
-    private void setCity(String city)
-    {
-        model.setCity(city);
-    }
-    private void setStreetAndNumber(String streetAndNumber)
-    {
-        model.setStreatAndNumber(streetAndNumber);
-    }
-    private void setPostCode(String postCode)
-    {
-        model.setPostCode(postCode);
-    }
-    private void setPhoneNumber(String phoneNumber)
-    {
-        model.setPhone(phoneNumber);
-    }
+
 
     private void setViewButtonSignUp()
     {
@@ -152,7 +88,7 @@ public class RegisterController {
     {
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        String sql="select * from user where login=?";
+        String sql="select * from users where login=?";
 
 
         try {
@@ -179,101 +115,79 @@ public class RegisterController {
     private void register()
     {
 
+
+
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        setErrorMessage(null);
+        setErrorMessage("");
         String err = "";
+
+        // login
+        String login = String.valueOf(view.getInputLogin());
+        Pattern pattern = Pattern.compile("\\w+");
+        Matcher matcher = pattern.matcher(login);
+        if (!matcher.matches()) {
+            err += "Wpisano niepoprawny login - login może zawierać tylko znaki używane w słowach\n";
+        }
+
+        //pass
         String pass = String.valueOf(view.getInputPassword());
         String repass = String.valueOf(view.getInputRepeatPassword());
-        if(!pass.equals(repass))
-        {
-            err += "Hasło jest niepoprawne \n";
+        pattern = Pattern.compile("[^ ]+");
+        matcher = pattern.matcher(pass);
+        if (!matcher.matches()) {
+            err += "Wpisane hasło jest niepoprawne - hasło nie może zawierać białych znakow\n";
+        } else if (!pass.equals(repass)) {
+            err += "Wpisane hasła nie są takie same\n";
         }
 
-/**
- *  1 Login
- *  2 Pass
- *  3 Pesel
- *  4 Name
- *  5 Surname
- *  6 City
- *  7 Streat and number
- *  8 PostCode
- *  9 phoneNumber
- *
- *
- */
 
-        String sql="{call addClient(?,?,?,?,?,?,?,?,?)}";
-        try{
-            con =  new Connectivity();
+        if (err == "") {
+            String sql = "{call addClient(?,?)}";
+            try {
+                con = new Connectivity();
 
-            if(isAdded(view.getInputLogin(), con))
-            {
-                err +="Podany login już istnieje \n";
+                if (isAdded(login, con)) {
+                    err += "Podany login już istnieje \n";
 
+                    view.setErrorLabel(err);
+                    //todo
+
+                } else if (err.length() < 1) {
+                    setLogin(view.getInputLogin());
+                    setPassword(String.valueOf(view.getInputPassword()));
+
+                    preparedStatement = con.getConn().prepareStatement(sql);
+
+                    preparedStatement.setString(1, getLogin());
+                    preparedStatement.setString(2, getPassword());
 
 
-                //todo
+                    resultSet = preparedStatement.executeQuery();
+                    if (isAdded(getLogin(), con)) {
+                        view.dispose();
+                        previouesView.setVisible(true);
 
-            }else if(err.length() < 1){
-                setLogin(view.getInputLogin());
-                setPassword(String.valueOf(view.getInputPassword()));
-                setPesel(view.getInputPesel());
-                setName(view.getInputName());
-                setSurname(view.getInputSurname());
-                setCity(view.getInputCity());
-                setStreetAndNumber(view.getInputStreetAndNo());
-                setPostCode(view.getInputPostCode());
-                setPhoneNumber(view.getInputPhoneNo());
-
-                preparedStatement = con.getConn().prepareStatement(sql);
-
-                preparedStatement.setString(1, getLogin());
-                preparedStatement.setString(2, getPassword());
-                preparedStatement.setString(3, getPesel());
-                preparedStatement.setString(4, getName());
-                preparedStatement.setString(5, getSurname());
-                preparedStatement.setString(6, getCity());
-                preparedStatement.setString(7, getStreatAndNumber());
-                preparedStatement.setString(8, getPostCode());
-                preparedStatement.setString(9, getPhoneNumber());
-
-                resultSet = preparedStatement.executeQuery();
-                if (isAdded(getLogin(), con)) {
-                    view.setVisible(false);
-                    previouesView.setVisible(true);
-
-                } else {
-
-                   //TODO  view.setErrorMessageLabel(err);
+                    }
                 }
+
+
+            } catch (SQLException ex) {
+                System.out.println(ex);
+                con.close();
+            } catch (Exception e) {
+                System.out.println(e);
+                con.close();
+            } finally {
+                con.close();
             }
-
-            if(err.length() > 1)
-            {
-                setErrorMessage(err);
-                System.out.println(getErrorMessage());
-
-
-            }
-
-
 
         }
-        catch(SQLException ex)
+        else
         {
-            System.out.println(ex);
-            con.close();
+            view.setErrorLabel(err);
+            System.out.println("Wiadomość o błędach \n"+err);
         }
-        catch (Exception e){
-            System.out.println(e);
-            con.close();
-        }
-        finally {
-            con.close();
-        }
-
     }
 
 

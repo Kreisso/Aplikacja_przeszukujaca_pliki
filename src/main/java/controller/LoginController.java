@@ -81,6 +81,7 @@ public class LoginController {
                 RegisterController registerController = new RegisterController(
                         new Register(), new RegisterFrame("Rejestracja"), view );
                 view.setVisible(false);
+                view.setErrorMessageLabel("");
             }
         });
     }
@@ -131,6 +132,7 @@ public class LoginController {
             }
             else {
                 //TODO add label with error
+                view.setErrorMessageLabel("Błędny login lub hasło");
                 con.close();
             }
         }
