@@ -48,21 +48,6 @@ public class SearchFileController {
         setViewCity();
     }
 
-    private String getModelCity(){
-        return model.getSample();
-    }
-
-
-    private void setModelCity(String city){
-        model.setSample(city);
-    }
-
-
-
-    private String getViewCity(){
-        return view.getInputSearchBySample();
-    }
-
     private void setViewCity(){
         view.setSearchByCityButton(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -73,7 +58,7 @@ public class SearchFileController {
                     multimap.clear();
                 }catch (ConcurrentModificationException e1)
                 {
-                    System.out.println("test");
+                    System.out.println("ConcurrentModificationException 1");
                 }finally {
 
                 }
@@ -95,7 +80,7 @@ public class SearchFileController {
                             addColumnsToTable(clientTCP.getMultimap());
                             break;
                         } catch (ConcurrentModificationException e1) {
-                            System.out.println("test");
+                            System.out.println("ConcurrentModificationException 2");
 
                             try {
                                 TimeUnit.SECONDS.sleep(3);

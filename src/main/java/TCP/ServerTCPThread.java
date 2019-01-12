@@ -29,6 +29,7 @@ public class ServerTCPThread extends Thread {
     {
 //    String path = "/Users/kreisso/Desktop/";
         String path = System.getProperty("user.dir");
+//        String path = System.getProperty("home.dir");
         file = new File(path);
 
         BlockingQueue<File> arrayBlockingQueue = new ArrayBlockingQueue<File>(5);

@@ -2,6 +2,7 @@ package TCP;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import controller.Server.Connectivity;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -9,6 +10,9 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class ClientTCP {
@@ -19,7 +23,7 @@ public class ClientTCP {
     {
         multimap = m;
         String args[] = new String[2];
-        args[0]= "192.168.8.116";
+        args[0]= getServerIp();
         args[1]= "12367";
         if (args.length < 2)
             System.out.println("Wprowadź adres serwera TCP oraz numer portu");
@@ -70,6 +74,46 @@ public class ClientTCP {
     }
 
     public Multimap<String, String> getMultimap() {
+        System.out.println(multimap.size());
         return multimap;
+    }
+
+    public String getServerIp()
+    {
+        String ip = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+
+        String sql="select ip from server_ip where id = 1";
+        Connectivity con = new Connectivity();
+        try{
+
+            preparedStatement = con.getConn().prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next())
+            {
+               ip = resultSet.getString("ip");
+
+            }
+            else
+            {
+                System.out.println("Brak ip servera");
+            }
+
+        }
+        catch(SQLException ex)
+        {
+            System.out.println(ex);
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+        finally {
+
+            con.close();
+            return ip;
+        }
     }
 }
